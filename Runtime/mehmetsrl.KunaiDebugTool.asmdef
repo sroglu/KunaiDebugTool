@@ -2,7 +2,6 @@
     "name": "mehmetsrl.KunaiDebugTool",
     "rootNamespace": "Kunai",
     "references": [
-        "PFound.LoopScheduler",
         "Unity.Collections",
         "Unity.Mathematics",
         "Unity.Burst",

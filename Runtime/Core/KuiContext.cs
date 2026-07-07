@@ -4,7 +4,6 @@ using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Profiling;
 using UnityEngine;
-using PFound.LoopScheduler;
 
 namespace Kunai
 {
@@ -62,7 +61,7 @@ namespace Kunai
 
             Instance = ctx;
 
-            LoopScheduler.RegisterBeforeRenderLoop(ctx.Tick, null);
+            Application.onBeforeRender += ctx.Tick;
 
             // WaitForEndOfFrame coroutine host. The overlay used to attach a
             // CommandBuffer to Camera.AfterEverything (and an SRP equivalent),
@@ -82,7 +81,7 @@ namespace Kunai
         {
             if (Instance == null) return;
 
-            LoopScheduler.DeregisterBeforeRenderLoop(Instance.Tick);
+            Application.onBeforeRender -= Instance.Tick;
 
             if (Instance._overlayRunner != null)
             {
