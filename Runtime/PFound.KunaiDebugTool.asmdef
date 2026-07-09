@@ -1,14 +1,15 @@
 {
-    "name": "mehmetsrl.KunaiDebugTool.Editor",
-    "rootNamespace": "Kunai.Editor",
+    "name": "PFound.KunaiDebugTool",
+    "rootNamespace": "Kunai",
     "references": [
-        "mehmetsrl.KunaiDebugTool"
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.InputSystem"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

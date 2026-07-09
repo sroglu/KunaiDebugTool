@@ -15,12 +15,12 @@ per-frame GC allocations** via a Burst-compiled vertex pipeline. Two-layer archi
 
 | Assembly | Folder | Namespace |
 |---|---|---|
-| `mehmetsrl.KunaiDebugTool` | `Runtime/` | `Kunai` |
-| `mehmetsrl.KunaiDebugTool.Editor` | `Editor/` | `Kunai` |
-| `mehmetsrl.KunaiDebugTool.Tests` | `Tests/Runtime/` | `Kunai` |
+| `PFound.KunaiDebugTool` | `Runtime/` | `Kunai` |
+| `PFound.KunaiDebugTool.Editor` | `Editor/` | `Kunai` |
+| `PFound.KunaiDebugTool.Tests` | `Tests/Runtime/` | `Kunai` |
 
-The `mehmetsrl.KunaiDebugTool*` asmdef namespace is a sanctioned, retained exception — do not rename
-it. The runtime C# namespace is `Kunai`; the static entry point is `KUI.*`.
+The runtime C# namespace is `Kunai` — a sanctioned product name, retained by design; do not rename
+it. The static entry point is `KUI.*`.
 
 ## Dependencies
 
@@ -512,7 +512,7 @@ proper `Samples~/` scenes.
 ## Testing
 
 `Tests/Runtime/` is an NUnit Editor-mode suite (`UNITY_INCLUDE_TESTS`, asmdef
-`mehmetsrl.KunaiDebugTool.Tests`) with fixtures: `KuiTextFieldTests`, `KuiReflectionScannerTests`,
+`PFound.KunaiDebugTool.Tests`) with fixtures: `KuiTextFieldTests`, `KuiReflectionScannerTests`,
 `KuiCategoryParserTests`, `KuiLogBufferCollapseTests`, `KuiFrameSamplerTests`,
 `KuiOptionRegistryTests`, `KuiCommandParserTests`, `KuiCommandRegistryTests`,
 `KuiBugReportSinkTests`.
