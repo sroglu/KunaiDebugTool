@@ -48,6 +48,8 @@ Third-party packages (runtime asmdef references):
 - `Unity.Burst` — compiles the hot-path vertex jobs to native SIMD.
 - `Unity.Collections` — `NativeArray` / `NativeList` / `NativeHashMap` for zero-GC data.
 - `Unity.Mathematics` — `float2` / `float4` / `math.*` for Burst-compatible math.
+- `Unity.InputSystem` — the new-Input-System half of the `KuiInput` facade. Referenced by the runtime
+  asmdef; the code behind it is compiled only when Unity defines `ENABLE_INPUT_SYSTEM`.
 
 Standalone **leaf** module — no dependency on any other PFound module. Registers directly on
 `UnityEngine.Application.onBeforeRender` to fill the command buffer before the camera renders it, so
@@ -178,12 +180,12 @@ programmatically via `KUI.IsVisible`. Call `KUI.Shutdown()` to tear it all down.
    *Project Settings → Graphics → Always Included Shaders*. It has no scene/material reference and
    would otherwise be stripped from a player build; `KUI.Initialize` asserts it can be found and
    throws (`Shader.Find` returns null) if it is missing.
-2. **Legacy input must be enabled.** *Player → Active Input Handling* must be `Input Manager (Old)`
-   or `Both`. Kunai reads keyboard / mouse / touch via the legacy `UnityEngine.Input` API. Under
-   `Input System Package (New)` **only**, legacy `Input` is fully disabled — the toggle keys
-   (`` ` `` / F1), the top-left double-tap, and touch indicators all silently no-op (the overlay
-   still renders if you set `KUI.IsVisible = true` programmatically). Changing this setting requires
-   an Editor restart to swap the input backend.
+2. **Input backend — no constraint.** *Player → Active Input Handling* may be `Input Manager (Old)`,
+   `Input System Package (New)`, or `Both`. All input goes through the `KuiInput` facade
+   (`Runtime/Input/KuiInput.cs`), which compiles against the new Input System when Unity defines
+   `ENABLE_INPUT_SYSTEM` and falls back to the legacy `UnityEngine.Input` manager otherwise. No Kunai
+   code touches `UnityEngine.Input` directly. Changing the setting requires an Editor restart, as
+   Unity has to swap the backend and recompile.
 3. **A `Camera.main` must exist.** Layout and the ortho projection are driven by
    `Camera.main.pixelWidth`/`pixelHeight`, so a camera tagged `MainCamera` must be present.
 

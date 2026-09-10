@@ -1,5 +1,35 @@
 # KunaiDebugTool — CHANGELOG
 
+## Backend-agnostic input + touch overlay + zero-allocation doc (2026-09-10)
+
+Entries below were already in the tree but had never been logged.
+
+### Input abstraction — works under any Active Input Handling setting
+
+- `KuiInput` (`Runtime/Input/KuiInput.cs`) is the single input facade: pointer
+  position / press / hold / release, scroll, touch count and primary-touch
+  position + delta, key checks, and `ConsumeTypedString()` for per-frame typed
+  characters. No other Kunai file touches `UnityEngine.Input`.
+- Every member has two implementations behind `#if ENABLE_INPUT_SYSTEM`: the new
+  Input System (`Pointer.current`, `Touchscreen.current`, `Keyboard.current`)
+  when Unity defines that symbol, the legacy `UnityEngine.Input` manager
+  otherwise. The previous requirement that *Active Input Handling* be
+  `Input Manager (Old)` or `Both` is therefore gone — all three settings work.
+- `Unity.InputSystem` is referenced by the runtime asmdef for the new-backend
+  half. See MODULE.md → Dependencies.
+
+### Touch indicator
+
+- `KuiTouchOverlay` draws the touch/mouse indicator ring, issued last each frame
+  and outside the window system. Toggled by `KuiSettings.EnableTouchIndicator`.
+
+### Docs
+
+- `ZERO-ALLOCATION.md` — layer-by-layer account of the one-draw-call, no-managed-
+  allocation render path, with an honest ledger of what is *not* zero (per-frame
+  `TempJob` native arrays, the Inspector's deliberate boxing, the absent
+  automated GC-delta test) and the rules custom windows must follow.
+
 ## Render order — overlay sits on top of UI Toolkit panels (2026-05-10)
 
 - `KuiOverlayRunner` MonoBehaviour pulls `KuiCanvas.ExecuteOnBackBuffer` from a
@@ -18,15 +48,16 @@
 ## Phase 2 — Console enhancements + 6 new tools + master toolbox (2026-05-03)
 
 Grew the single-Console Phase 1 overlay into a 7-window debug suite without
-breaking the perf budget (1 draw call, ≈0 GC, < 1 ms tick budget). Spec:
-[`specs/009-kunai-phase2-suite/`](../../specs/009-kunai-phase2-suite/).
+breaking the perf budget (1 draw call, ≈0 GC, < 1 ms tick budget).
 
 ### Wave 0 — shared infrastructure
 
 - `KuiInputFocus` — single-owner widget focus model (multiple TextFields
   arbitrate one keyboard).
 - `KUI.TextField` (+ `KuiTextFieldState` value-type with fixed 256-char buffer,
-  desktop `Input.inputString` + mobile `TouchScreenKeyboard`).
+  desktop typed characters + mobile `TouchScreenKeyboard`). Typed characters now
+  arrive via `KuiInput.ConsumeTypedString()` — see the input-abstraction entry
+  above; this wave originally read `Input.inputString` directly.
 - `KUI.ChipStrip` — horizontal-scroll toggleable chips.
 - `KUI.BeginCollapsible` / `EndCollapsible`.
 - `KuiReflectionScanner` — generic `Scan<TAttr>` reused by D4 / D5.
