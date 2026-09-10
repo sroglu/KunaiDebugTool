@@ -34,7 +34,13 @@ Full detail in [MODULE.md](MODULE.md).
 The overlay renders from a BMFont atlas baked out of **Iosevka Nerd Font Mono**
 (SIL Open Font License 1.1). The licence text and attribution live in
 [bake/IosevkaNerdFontMono-Regular.LICENSE.md](bake/IosevkaNerdFontMono-Regular.LICENSE.md), and
-cover both the bundled `.ttf` and the generated atlas. `bake/bake.sh` regenerates the atlas.
+cover both the bundled `.ttf` and the generated atlas.
+
+The `.ttf` is committed on purpose: it is the pinned source `bake/bake.sh` regenerates the atlas
+from, together with `bake/chars.txt` (95 printable ASCII + 42 icon glyphs). Re-baking from the
+committed pair reproduces the shipped `.fnt.txt` / `.png` byte for byte — downloading the font
+again would not, since Nerd Fonts releases move. The atlas must land inside a `Resources/` folder;
+set `KUNAI_ATLAS_OUT_DIR` to point the script at your project.
 
 ## Docs
 

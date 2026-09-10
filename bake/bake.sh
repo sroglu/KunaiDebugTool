@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Bake Iosevka Nerd Font Mono → BMFont atlas for KunaiDebugTool.
-# Output: Assets/GameSpecific/KunaiDebugTool/IosevkaKunai.{fnt,png}
+# Output: Assets/SampleGame/Resources/IosevkaKunai.{fnt.txt,png}  (override with KUNAI_ATLAS_OUT_DIR)
 #
 # Prerequisites:
 #   1. fontbm  → brew install vladimirgamalyan/tap/fontbm   (or build from https://github.com/vladimirgamalyan/fontbm)
@@ -15,7 +15,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 FONT_TTF="$SCRIPT_DIR/IosevkaNerdFontMono-Regular.ttf"
 CHARS_FILE="$SCRIPT_DIR/chars.txt"
-OUT_DIR="$REPO_ROOT/Assets/GameSpecific/KunaiDebugTool"
+# The baked atlas MUST land inside a Resources/ folder — the runtime loads it with
+# Resources.Load("IosevkaKunai"). Override for a different consuming project:
+#   KUNAI_ATLAS_OUT_DIR=/path/to/Assets/<anything>/Resources ./bake.sh
+OUT_DIR="${KUNAI_ATLAS_OUT_DIR:-$REPO_ROOT/Assets/SampleGame/Resources}"
 OUT_NAME="IosevkaKunai"
 
 if [[ ! -f "$FONT_TTF" ]]; then
@@ -37,6 +40,11 @@ if [[ -z "$FONTBM" ]]; then
     exit 1
   fi
 fi
+
+case "$OUT_DIR" in
+  */Resources|*/Resources/*) ;;
+  *) echo "WARNING: $OUT_DIR is not inside a Resources/ folder — Resources.Load will not find the atlas." ;;
+esac
 
 mkdir -p "$OUT_DIR"
 
