@@ -15,10 +15,27 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 FONT_TTF="$SCRIPT_DIR/IosevkaNerdFontMono-Regular.ttf"
 CHARS_FILE="$SCRIPT_DIR/chars.txt"
-# The baked atlas MUST land inside a Resources/ folder — the runtime loads it with
-# Resources.Load("IosevkaKunai"). Override for a different consuming project:
+# Where the baked atlas lands. It MUST be a Resources/ folder — the runtime loads it
+# with Resources.Load("IosevkaKunai"). Consuming projects put it in different places,
+# so the known layouts are probed in order; override for anything else:
 #   KUNAI_ATLAS_OUT_DIR=/path/to/Assets/<anything>/Resources ./bake.sh
-OUT_DIR="${KUNAI_ATLAS_OUT_DIR:-$REPO_ROOT/Assets/SampleGame/Resources}"
+if [[ -n "${KUNAI_ATLAS_OUT_DIR:-}" ]]; then
+  OUT_DIR="$KUNAI_ATLAS_OUT_DIR"
+else
+  OUT_DIR=""
+  for candidate in \
+    "$REPO_ROOT/Assets/GameSpecific/KunaiDebugTool/Resources" \
+    "$REPO_ROOT/Assets/SampleGame/Resources"
+  do
+    if [[ -d "$candidate" ]]; then OUT_DIR="$candidate"; break; fi
+  done
+  if [[ -z "$OUT_DIR" ]]; then
+    echo "ERROR: no known atlas Resources folder under $REPO_ROOT/Assets."
+    echo "Set KUNAI_ATLAS_OUT_DIR to the Resources folder the atlas should land in."
+    exit 1
+  fi
+  echo "Atlas output: $OUT_DIR"
+fi
 OUT_NAME="IosevkaKunai"
 
 if [[ ! -f "$FONT_TTF" ]]; then
@@ -60,8 +77,11 @@ mkdir -p "$OUT_DIR"
   --output "$OUT_DIR/$OUT_NAME"
 
 # Unity treats .txt as TextAsset; .fnt is unrecognized. Rename for direct asset reference.
-rm -f "$OUT_DIR/$OUT_NAME.fnt.txt" "$OUT_DIR/$OUT_NAME.fnt.txt.meta"
-mv "$OUT_DIR/$OUT_NAME.fnt" "$OUT_DIR/$OUT_NAME.fnt.txt"
+# Deliberately keep any existing .fnt.txt.meta: deleting it makes Unity mint a fresh
+# GUID on reimport, which breaks every GUID reference to the metrics asset. mv
+# overwrites the content in place, so the meta stays valid.
+rm -f "$OUT_DIR/$OUT_NAME.fnt.txt"
+mv -f "$OUT_DIR/$OUT_NAME.fnt" "$OUT_DIR/$OUT_NAME.fnt.txt"
 
 # Clean up legacy suffixed PNG from previous bakes (if any).
 rm -f "$OUT_DIR/${OUT_NAME}_0.png" "$OUT_DIR/${OUT_NAME}_0.png.meta"
